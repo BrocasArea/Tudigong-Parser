@@ -1,6 +1,8 @@
 const asyncWrap = require('async-functions-wrap')
 const fs = require('fs')
 const xml2js = require('xml2js')
+const request = require('superagent')
+const bluebird = require('bluebird')
 
 asyncWrap(async () => {  
   let parser = new xml2js.Parser()
@@ -37,9 +39,32 @@ asyncWrap(async () => {
   })
   console.log('All Tudigong: ', formated.length)
 
+  // enrich
+  // 'https://maps.googleapis.com/maps/api/geocode/json?parameters'
+
+  let enriched = await bluebird.mapSeries(formated, async (temple, index) => {
+    let res
+    try {
+      console.log('%s, query location: %s', index, temple.address)
+      res = await request
+        .get('https://maps.googleapis.com/maps/api/geocode/json')
+        .query({ address: temple.address })
+      console.log('done', index)
+
+      if (res.body.status === 'ZERO_RESULTS') return temple
+
+      //
+      temple.location = res.body.results[0].geometry.location
+      return temple
+    } catch (e) {
+      console.error(e, 'index', index, temple, res.body)
+      throw e
+    }
+  })
+
   // save to file
   await (new Promise((resolve, reject) => {
-    fs.writeFile(__dirname + '/data/temple.json', JSON.stringify(formated), function (err) {
+    fs.writeFile(__dirname + '/data/temple.json', JSON.stringify(enriched), function (err) {
       if (err) return reject(err)
       return resolve()
     });

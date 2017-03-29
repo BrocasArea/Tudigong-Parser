@@ -18,6 +18,8 @@
   "homepage": "https://github.com/BrocasArea/Tudigong-Parser#readme",
   "dependencies": {
     "async-functions-wrap": "~0.0.2",
+    "bluebird": "~3.5.0",
+    "superagent": "~3.5.2",
     "xml2js": "~0.4.17"
   }
 }
