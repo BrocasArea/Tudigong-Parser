@@ -39,7 +39,7 @@ asyncWrap(async () => {
 
   // save to file
   await (new Promise((resolve, reject) => {
-    fs.writeFile(__dirname + '/data/temple.json', JSON.stringify(filtered), function (err) {
+    fs.writeFile(__dirname + '/data/temple.json', JSON.stringify(formated), function (err) {
       if (err) return reject(err)
       return resolve()
     });
